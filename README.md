@@ -1,7 +1,7 @@
-# Sistemas Operacionais ScrumTeam
+# Sistemas Operacionais - ScrumTeam
 
 
-<h3> Trabalho 2 - Disciplina TT304 - FT Unicamp<h3>
+<h2> Trabalho 2 - Disciplina TT304 - FT Unicamp <h2>
 
 
 
