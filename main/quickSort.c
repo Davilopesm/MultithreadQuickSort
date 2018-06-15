@@ -6,6 +6,7 @@
 
 int part = 0;
 
+//struct para fazer o vetor dinamico e nmr de threads dinamicos
 struct arg_struct {
     int n;
     int threads;
@@ -16,7 +17,7 @@ struct arg_struct args;
 
 
 int partition(float vetor[], int esq, int dir){
-
+    //função para dividir e trocar o valor nas posições do array
     float aux;//trocar a posição
     int contador = esq;
 
@@ -51,6 +52,7 @@ void quickSort(float vetor[], int esq, int dir){
 
 void* quickSortThread(void *arg){
   int k = 0, posDividido;
+
   // dividindo o array
   int thread_part = part++;
 
@@ -89,6 +91,7 @@ int main(){
       fscanf(file, "%f", &vetorParaOrdenar[i]);
   }
 
+  //passando o vetor lido para o vetor dinamico da struct
   args.a = vetorParaOrdenar;
 
   fclose(file);
@@ -116,10 +119,12 @@ int main(){
       pthread_join(threads[i], NULL);
       //printf("Join da Thread: %d\n", i);
   }
+
   //passando o quick sort final nas partes rearranjadas
   quickSort(args.a, 0, args.n-1);
   t2 = clock();
 
+  //usando a função clock() para determinar o tempo levado para executar o quickSort
   printf("Tempo demorado: %f\n",(t2-t1) / (double)CLOCKS_PER_SEC);
 
 
