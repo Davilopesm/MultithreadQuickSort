@@ -4,12 +4,15 @@
 #include <pthread.h>
 #include <sys/types.h>
 
-
-#define MAX 100000
-#define THREADS 8
-
-float a[MAX];
 int part = 0;
+
+struct arg_struct {
+    int n;
+    int threads;
+    float *a;
+};
+
+struct arg_struct args;
 
 
 int partition(float vetor[], int esq, int dir){
@@ -47,115 +50,90 @@ void quickSort(float vetor[], int esq, int dir){
 }
 
 void* quickSortThread(void *arg){
-
-  int k = 0;
-
-  printf("Rodando: \n");
-  // which part out of 2 parts
+  int k = 0, posDividido;
+  // dividindo o array
   int thread_part = part++;
 
-  // calculating low and high
-  int esq = thread_part * (MAX / THREADS);
-  int dir = (thread_part + 1) * (MAX / THREADS) - 1;
+  // calcular direito e esquerdo
+  int esq = thread_part * (args.n / args.threads);
+  int dir = (thread_part + 1) * (args.n / args.threads) - 1;
 
-  // evaluating mid point
-  int posDividido = esq + (dir - esq) / 2;
+  // pegar o meio da divisão de direito e esquerdo
+  posDividido = esq + (dir - esq) / 2;
   if (esq < dir) {
-      quickSort(arg, esq, posDividido-1);
-      quickSort(arg, posDividido+1, dir);
+      quickSort(args.a, esq, posDividido-1);
+      quickSort(args.a, posDividido+1, dir);
   }
 }
 
 
 int main(){
   char nomeArquivoEntrada[15], nomeArquivoSaida[15];
-  clock_t t1, t2;
-  printf("Nome do Arquivo para ler esses %d dados: ", MAX);
-  //getchar();
+  clock_t t;
+  int nthread, i, teste = 0, n;
+
+  //determinar tamanho de elementos do vetor
+  printf("Tamanho do Vetor: ");
+  scanf("%d", &args.n);
+  float vetorParaOrdenar[args.n];
+
+  //determinar o nome do arquivo para pegar os n elementos
+  printf("Nome do Arquivo para ler esses %d dados: ", args.n);
   scanf("%s", &nomeArquivoEntrada);
 
 
   FILE *file;
   file = fopen(nomeArquivoEntrada, "r");
 
-  for(int i=0; i < MAX; i++){
-      fscanf(file, "%f", &a[i]);;
+  for(int i=0; i < args.n; i++){
+      fscanf(file, "%f", &vetorParaOrdenar[i]);
   }
+
+  args.a = vetorParaOrdenar;
 
   fclose(file);
 
-  if(a == NULL){
+  if(args.a == NULL){
       printf("Erro para abrir Arquivo %s", nomeArquivoEntrada);
       return 0;
   }
 
-  int nthread;
-
-  int i;
-  /*
-  for (i = 0; i < MAX; i++) {
-      a[i] = rand() % MAX;
-      printf("%f\n", a[i]);
-  }
-
-  printf("\n\n");*/
-
-
+  //determinar numero de threads
   printf("Numero de Threads: ");
-  scanf("%d", &nthread);
+  scanf("%d", &args.threads);
 
-  t1 = clock();
-  pthread_t threads[nthread];
+  t = clock();
+  pthread_t threads[args.threads];
 
-  for(i = 0; i < nthread; i++){
-      pthread_create(&threads[i], NULL, quickSortThread, (void*)a);
-      printf("thread criada: %d\n", i);
+  //criar e rodar as threads
+  for(i = 0; i < args.threads; i++){
+      pthread_create(&threads[i], NULL, quickSortThread, (void *)NULL);
+      //printf("Thread criada: %d\n", i);
   }
 
-  for (i = 0; i < nthread; i++){
+  for (i = 0; i < args.threads; i++){
       pthread_join(threads[i], NULL);
-      printf("juntando: %d\n", i);
+      //printf("Join da Thread: %d\n", i);
   }
-  t2 = clock();
+  t = clock() - t;
 
-  int teste = 0;
-  //quickSort(a, 0, MAX-1);//*
-  /*
-  printf("Deseja printar o vetor ordenado: ");
-  scanf("%d", &teste);
-  if(teste == 1){
-    for (i = 0; i < MAX; i++) {
-        printf("%f\n", a[i]);
-    }
-  }*/
+  //passando o quick sort final nas partes rearranjadas
+  quickSort(args.a, 0, args.n-1);
 
+  //determinar e salvar o arquivo de saida
+  printf("Nome do Arquivo para salvar vetor ordenado: ");
+  scanf("%s", &nomeArquivoSaida);
 
-/*    int n;
+  FILE *fileSaida;
+  fileSaida = fopen(nomeArquivoSaida, "w+");
 
-    printf("Numero de elementos do vetor: ");
-    scanf("%d", &n);*/
+  for(int j=0; j<args.n; j++){
+    fprintf(fileSaida, "%.0f\n", args.a[j]);
+  }
 
+  fclose(fileSaida);
 
-
-
-
-
-    printf("Nome do Arquivo para salvar vetor ordenado: ");
-    //fgets(nomeArquivoSaida, sizeof(nomeArquivoSaida), stdin);
-    scanf("%s", &nomeArquivoSaida);
-
-    FILE *fileSaida;
-    fileSaida = fopen(nomeArquivoSaida, "w+");
-
-    for(int j=0; j<MAX; j++){
-        fprintf(fileSaida, "%.3f\n", a[j]);
-    }
-
-    fclose(fileSaida);
-
-    printf("Tempo demorado: %f\n", (t2 - t1) / (double)CLOCKS_PER_SEC);
-
-    //getch();
-
+  printf("Tempo demorado: %f\n",((float)t) / CLOCKS_PER_SEC);
+  return 0;
 
 }
