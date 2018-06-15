@@ -69,7 +69,7 @@ void* quickSortThread(void *arg){
 
 int main(){
   char nomeArquivoEntrada[15], nomeArquivoSaida[15];
-  clock_t t;
+  clock_t t1, t2;
   int nthread, i, teste = 0, n;
 
   //determinar tamanho de elementos do vetor
@@ -102,10 +102,11 @@ int main(){
   printf("Numero de Threads: ");
   scanf("%d", &args.threads);
 
-  t = clock();
+
   pthread_t threads[args.threads];
 
   //criar e rodar as threads
+  t1 = clock();
   for(i = 0; i < args.threads; i++){
       pthread_create(&threads[i], NULL, quickSortThread, (void *)NULL);
       //printf("Thread criada: %d\n", i);
@@ -115,10 +116,12 @@ int main(){
       pthread_join(threads[i], NULL);
       //printf("Join da Thread: %d\n", i);
   }
-  t = clock() - t;
-
   //passando o quick sort final nas partes rearranjadas
   quickSort(args.a, 0, args.n-1);
+  t2 = clock();
+
+  printf("Tempo demorado: %f\n",(t2-t1) / (double)CLOCKS_PER_SEC);
+
 
   //determinar e salvar o arquivo de saida
   printf("Nome do Arquivo para salvar vetor ordenado: ");
@@ -132,8 +135,6 @@ int main(){
   }
 
   fclose(fileSaida);
-
-  printf("Tempo demorado: %f\n",((float)t) / CLOCKS_PER_SEC);
   return 0;
 
 }
