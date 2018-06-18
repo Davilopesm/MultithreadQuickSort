@@ -72,7 +72,7 @@ void* quickSortThread(void *arg){
 int main(){
   char nomeArquivoEntrada[15], nomeArquivoSaida[15];
   clock_t t1, t2;
-  int nthread, i, teste = 0, n;
+  int i;
 
   //determinar tamanho de elementos do vetor
   printf("Tamanho do Vetor: ");
@@ -87,7 +87,7 @@ int main(){
   FILE *file;
   file = fopen(nomeArquivoEntrada, "r");
 
-  for(int i=0; i < args.n; i++){
+  for(i=0; i < args.n; i++){
       fscanf(file, "%f", &vetorParaOrdenar[i]);
   }
 
@@ -135,8 +135,8 @@ int main(){
   FILE *fileSaida;
   fileSaida = fopen(nomeArquivoSaida, "w+");
 
-  for(int j=0; j<args.n; j++){
-    fprintf(fileSaida, "%.0f\n", args.a[j]);
+  for(i=0; i<args.n; i++){
+    fprintf(fileSaida, "%f\n", args.a[i]);
   }
 
   fclose(fileSaida);
