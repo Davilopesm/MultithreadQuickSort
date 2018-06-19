@@ -61,8 +61,9 @@ void* quickSortThread(void *arg){
   int dir = (thread_part + 1) * (args.n / args.threads) - 1;
 
   // pegar o meio da divisão de direito e esquerdo
-  posDividido = esq + (dir - esq) / 2;
+  //posDividido = esq + (dir - esq) / 2;
   if (esq < dir) {
+      posDividido = partition(args.a, esq, dir);
       quickSort(args.a, esq, posDividido-1);
       quickSort(args.a, posDividido+1, dir);
   }
